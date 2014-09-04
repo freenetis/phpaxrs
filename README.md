@@ -1,14 +1,14 @@
 PHPAX-RS
 ========
 
+[![Build Status](https://api.travis-ci.org/freenetis/phpaxrs.svg?branch=master)](https://travis-ci.org/freenetis/phpaxrs)
+
 PHPAX-RS is a [JAX-RS](https://jax-rs-spec.java.net/) like framework for writing REST APIs in PHP. It does not support all JAX-RS features, it only tries to bring the style of writing of REST resources that is known in Java EE world into PHP.
 
 Key features of PHPAX-RS are following:
 - mapping of HTTP requests to PHP methods using annotations with support for URL path templates,
 - easy serialization/deserialization of input/output data without writing code to convert them,
 - grouping REST resources using OOP classes.
-
-[![Build Status](https://travis-ci.org/nette/tracy.svg?branch=master)](https://travis-ci.org/freenetis/phpaxrs)
 
 ## How to install?
 
