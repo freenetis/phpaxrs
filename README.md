@@ -36,7 +36,7 @@ For easy building of `HttpResponse` the `ResponseBuilder` class may be used.
 class ExampleEndpoint {
     
     /**
-     * Data with which we manipulates.
+     * Data storage - commonly data are fetch from a DB.
      */
     private static $data = array(
         1 => 'Test',
@@ -97,15 +97,6 @@ class ExampleEndpoint {
             return ResponseBuilder::ok();
         }
         return ResponseBuilder::not_found();
-    }
-    
-    /**
-     * @GET
-     * @Path(/count)
-     * @Produces(text/plain)
-     */
-    public function count() {
-        return ResponseBuilder::ok(count(self::$data));
     }
     
 }
