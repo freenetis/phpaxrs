@@ -125,7 +125,7 @@ $phpaxrs->add_endpoint('/my-test-end-point');
 
 Using `curl` in bash test `get_all` method:
 ```bash
-curl -i -X GET -H "Accept: application/json" "http://localhost/rest-api/test"
+curl -i -X GET -H "Accept: application/json" "http://localhost/rest-api/test/my-test-end-point"
 ```
 and output should be following:
 `{"1":"Test","2":"Test 2"}`
