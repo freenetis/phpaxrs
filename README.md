@@ -8,6 +8,7 @@ Key features of PHPAX-RS are following:
 - easy serialization/deserialization of input/output data without writing code to convert them,
 - grouping REST resources using OOP classes.
 
+[![Build Status](https://travis-ci.org/nette/tracy.svg?branch=master)](https://travis-ci.org/freenetis/phpaxrs)
 
 ## How to install?
 
