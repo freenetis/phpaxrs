@@ -1,12 +1,12 @@
 PHPAX-RS
 ========
 
-PHPAX-RS is a [JAX-RS](https://jax-rs-spec.java.net/) like framework for writing REST APIs in PHP. It does not support all JAX-RS features but it only tries to bring the style of writing of REST resources that is known in Java EE world into PHP.
+PHPAX-RS is a [JAX-RS](https://jax-rs-spec.java.net/) like framework for writing REST APIs in PHP. It does not support all JAX-RS features, it only tries to bring the style of writing of REST resources that is known in Java EE world into PHP.
 
 Key features of PHPAX-RS are following:
-- mapping of HTTP requests to PHP method using annotations with support for URL path templates
-- easy serialization/deserialization of input/output data without writing code to convert them
-- grouping REST resources using OOP classes
+- mapping of HTTP requests to PHP methods using annotations with support for URL path templates,
+- easy serialization/deserialization of input/output data without writing code to convert them,
+- grouping REST resources using OOP classes.
 
 
 ## How to install?
@@ -17,9 +17,15 @@ Key features of PHPAX-RS are following:
 
 ### 1. Create a resource end point class
 
-Class methods are annotated in order to provide information for binding of HTTP requests. HTTP method is indicated using `@GET`, `@POST`, `@PUT` or `@DELETE` annotations. Accepted or provided MINE types of request or responses bodies are defined using `@Consumes` and `@Produces` annotations. For removing of duplicate code, global MINE types may be defined using class annotations.
+Class methods are annotated in order to provide information for binding of HTTP requests. HTTP method is indicated using `@GET`, `@POST`, `@PUT` or `@DELETE` annotation. Accepted or provided MIME types of request or responses bodies are defined using `@Consumes` and `@Produces` annotations. For removing of duplicate code, global MIME types may be defined using class annotations.
 
-All methods are mapped to a path relative to the end point path that is specified during end point registration. Annotation `@Path` may be used for mapping of a method to subpath by defining path template of desired subpath. Path template may contain parameters denoted by `{ name [: regex] }`, e.g. `{myParam}`, `{id:\d+}`, `{id:[1-9][0-9]*}`. Name of param may contain only letters and optional regex is a common PHP regular expression. Regex can be use for parameter value validation and mapping specification. Value of parameter may ontain any character except for `/`. 
+All methods are mapped to a path relative to the end point path that is specified during end point registration. Annotation `@Path` may be used for mapping of a method to a subpath by defining path template of desired subpath. Path template may contain parameters writter in following syntax: `{name[:regex]}`, e.g. `{myParam}`, `{id:\d+}`, `{id:[1-9][0-9]*}`. The param name may contain only letters and the optional regex is a common PHP regular expression. The regex can be use for parameter value validation and mapping restriction. Value of parameter may ontain any character except for `/` and must be matched agains regex if it is specified.
+
+A method mapped by above instructions is called if it match the HTTP request path and accept/provide same data types as HTTP request headers accept and content-type specifies. If request was invoked with PUT or POST HTTP method than the first argument passed to the method is sended request body. No data conversion is required passed body data are already handled by serializator. Arguments that follows contains values matched agains path template parameters. For better orientation in code they should be named same as parameter names are. Rest of request variables may be obtain by common PHP utilities and procedures (e.g. query string using `$_GET` variable).
+
+Responses may are formed from what your method returns. If it is an instance of `\phpaxrs\http\HttpResponse` than it is directly used as the response. If nothing is returned than no content HTTP message with code 204 is sended as the response. If some object is returned than it is seialized, set up as response body and send with with HTTP message OK (code 200). If an exception is thrown during method processing then error HTTP response with code 500 is send. If no suitable method for the request was found than one of 4xx codes is sended as response (e.g. not found - 404).
+For easy building of `HttpResponse` the `ResponseBuilder` class may be used.
+
 
 ```php
 /**
@@ -104,7 +110,7 @@ class ExampleEndpoint {
 }
 ```
 
-### 2. Init framework, add serializators and map our end point to a path
+### 2. Init framework, add serializators and map end points to a path
 
 ```php
 // init framework with full path at host
@@ -126,11 +132,12 @@ and output should be following:
 
 ## What are supported exchange data formats?
 
-Just JSON for now, but you can write your custom serializator for any format you want. Its simple, just implement `\phpaxrs\serializator\ISerializator` interface and than register its class with supported MINE type using `add_serializator` method as show shown before.
+Just JSON for now, but you can write your custom serializator for any format you want. Its simple, just implement `\phpaxrs\serializator\ISerializator` interface and than register its class together with supported MINE type using `add_serializator` method as show shown before.
 
 ## TODO list - what is not done yet?
 
 - support for HTTP Accept header with stars (e.g. `*/*` or `text/*`)
-- authorization&authentification
+- authorization & authentification
 - produce/consume multiple accept/content types in single mapped class
-- *many more, this framework is not finished yet :-(*
+- PHP error catching
+- *many more - this is just an early look*
