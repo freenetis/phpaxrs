@@ -110,7 +110,7 @@ $phpaxrs = new \phpaxrs\PhpaxRs('/rest-api/test');
 // add serializator for JSON
 $phpaxrs->add_serializator('application/json', '\phpaxrs\serializator\JsonSerializator');
 // add end point and map it to relative URL to base user
-$phpaxrs->add_endpoint('/my-test-end-point');
+$phpaxrs->add_endpoint('/my-test-end-point', 'ExampleEndpoint');
 ```
 
 ### 3. Deploy and test
