@@ -18,12 +18,14 @@ class DocCommentWrapperTest extends \PHPUnit_Framework_TestCase {
                 "/** @GET\n"
                 . " *\n"
                 . " *\n"
-                . " * @Consumes(/abs/{id:[0-9]+})\n"
-                . " * @Consumes(/uhk)\n"
+                . " * @Path(/abs/{id:[0-9]+})\n"
+                . " * @Consumes(application/json)\n"
+                . " * @Consumes(text/plain)\n"
                 . " */",
                 array(
                     'GET' => array(),
-                    'Consumes' => array('/abs/{id:[0-9]+}', '/uhk')
+                    'Path' => array('/abs/{id:[0-9]+}'),
+                    'Consumes' => array('application/json', 'text/plain')
                 )
             )
         );
