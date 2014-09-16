@@ -126,10 +126,7 @@ and output should be following:
 
 Just JSON for now, but you can write your custom serializator for any format you want. Its simple, just implement `\phpaxrs\serializator\ISerializator` interface and than register its class together with supported MINE type using `add_serializator` method as show shown before.
 
-## TODO list - what is not done yet?
+## TODO list - what important is not done yet?
 
-- support for HTTP Accept header with stars (e.g. `*/*` or `text/*`)
-- authorization & authentification
 - produce/consume multiple accept/content types in single mapped method/class
 - PHP error catching
-- *many more - this is just an early look*
