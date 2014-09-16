@@ -54,7 +54,9 @@ class HttpUtilTest extends \PHPUnit_Framework_TestCase {
             array('text/*', 'text/plain', TRUE),
             array('text/*', 'tex/plain', FALSE),
             array('text/*', 'text/', FALSE),
-            array('*/*', 'text/plain', TRUE)
+            array('*/*', 'text/plain', TRUE),
+            array('*/*', 'application/xhtml+xml', TRUE),
+            array('application/xhtml+xml', 'application/xhtml+xml', TRUE)
         );
     }
 

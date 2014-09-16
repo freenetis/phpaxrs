@@ -125,8 +125,8 @@ class HttpUtil {
      */
     public static function accept_match($accept_mime, $mime) {
         // invalid MIME
-        if (!preg_match('/^([*]|[-\w]+)\/([*]|[-\w]+)$/', $accept_mime) ||
-                !preg_match('/^[-\w]+\/[-\w]+$/', $mime)) {
+        if (!preg_match('/^([*]|[-\w]+)\/([*]|[-+\w]+)$/', $accept_mime) ||
+                !preg_match('/^[-\w]+\/[-+\w]+$/', $mime)) {
             return FALSE;
         }
         // string match
