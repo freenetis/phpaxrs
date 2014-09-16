@@ -90,7 +90,7 @@ class HttpUtil {
      * Parses HTTP accept header and returned ordered by height.
      * 
      * @param string $accepts HTTP accept header string
-     * @return array array of mine types
+     * @return array array of MIME types
      */
     public static function parse_accept_header($accepts) {
         if (empty($accepts)) {
@@ -111,7 +111,7 @@ class HttpUtil {
         // sort by weight (we need stable algorithm!)
         array_multisort($accepts_parsed, SORT_DESC, SORT_NUMERIC,
                 range(1, count($accepts_parsed)), SORT_ASC, SORT_NUMERIC);
-        // return sorted accepts mines
+        // return sorted accepts MIMEs
         return array_keys($accepts_parsed);
     }
 
@@ -119,24 +119,24 @@ class HttpUtil {
      * Checks whether given accept MIME that may contain * match given full
      * MIME.
      * 
-     * @param string $accept_mine MIME type that may contain * (e.g. text/*)
-     * @param string $mine full MIME (e.g. application/json)
+     * @param string $accept_mime MIME type that may contain * (e.g. text/*)
+     * @param string $mime full MIME (e.g. application/json)
      * @return boolean match?
      */
-    public static function accept_match($accept_mine, $mine) {
+    public static function accept_match($accept_mime, $mime) {
         // invalid MIME
-        if (!preg_match('/^([*]|[-\w]+)\/([*]|[-\w]+)$/', $accept_mine) ||
-                !preg_match('/^[-\w]+\/[-\w]+$/', $mine)) {
+        if (!preg_match('/^([*]|[-\w]+)\/([*]|[-\w]+)$/', $accept_mime) ||
+                !preg_match('/^[-\w]+\/[-\w]+$/', $mime)) {
             return FALSE;
         }
         // string match
-        if (strpos($accept_mine, '*') === FALSE) {
-            return (strcmp($accept_mine, $mine) == 0); 
+        if (strpos($accept_mime, '*') === FALSE) {
+            return (strcmp($accept_mime, $mime) == 0); 
         }
         // build regex
-        $am_regex = '|' . str_replace('*', '([-\w]+)', $accept_mine) . '|';
+        $am_regex = '|' . str_replace('*', '([-\w]+)', $accept_mime) . '|';
         // match?
-        return !!preg_match($am_regex, $mine);
+        return !!preg_match($am_regex, $mime);
     }
 
 }

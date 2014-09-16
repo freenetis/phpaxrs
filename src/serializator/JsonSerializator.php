@@ -9,7 +9,7 @@ namespace phpaxrs\serializator;
 
 /**
  * The "JsonSerializator" class that implements ISerialization for JSON format
- * with mine type "application/json".
+ * with MIME type "application/json".
  *
  * @author Ondřej Fibich <ondrej.fibich@gmail.com>
  */

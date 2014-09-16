@@ -30,7 +30,7 @@ class PhpaxRs {
     /**
      * Serializators for (un)marchalling of object from request and responses.
      * 
-     * Stored in associative array where key is accepted mine and value is
+     * Stored in associative array where key is accepted MIME and value is
      * name of serializator class.
      *
      * @var Array
@@ -83,36 +83,36 @@ class PhpaxRs {
     }
     
     /**
-     * Adds serializator for (un)marchalling of object with given mine type.
+     * Adds serializator for (un)marchalling of object with given MIME type.
      * 
-     * @param string $mine MINE (e.g. application/json)
+     * @param string $mime MINE (e.g. application/json)
      * @param string $serializator_cn class name
-     * @throws InvalidArgumentException on invalid arguments or existing mine
+     * @throws InvalidArgumentException on invalid arguments or existing MIME
      */
-    public function add_serializator($mine, $serializator_cn) {
+    public function add_serializator($mime, $serializator_cn) {
         if (empty($serializator_cn)) {
             throw new InvalidArgumentException('invalid serializator');
         }
-        $mine = mb_strtolower(trim($mine));
-        if (empty($mine)) {
-            throw new InvalidArgumentException('invalid mine: ' . $mine);
+        $mime = mb_strtolower(trim($mime));
+        if (empty($mime)) {
+            throw new InvalidArgumentException('invalid mime: ' . $mime);
         }
-        if (array_key_exists($mine, $this->serializators)) {
-            $m = 'serializator for mine ' . $mine . ' already exist';
+        if (array_key_exists($mime, $this->serializators)) {
+            $m = 'serializator for mime ' . $mime . ' already exist';
             throw new InvalidArgumentException($m);
         }
-        $this->serializators[$mine] = $serializator_cn;
+        $this->serializators[$mime] = $serializator_cn;
     }
 
     /**
-     * Creates serializator for the given mine type.
+     * Creates serializator for the given MIME type.
      * 
-     * @param string $mine mine of serializator
+     * @param string $mime MIME of serializator
      * @return null|serializator\ISerializator null if not founded or instance
      * @throws \ErrorException on invalid founded serializator (invalid sub class)
      */
-    public function create_serializer($mine) {
-        $consumer = $this->find_serializator($mine);
+    public function create_serializer($mime) {
+        $consumer = $this->find_serializator($mime);
         if ($consumer === NULL) {
             return NULL;
         }
@@ -227,8 +227,8 @@ class PhpaxRs {
                 }
                 throw new \ErrorException('@Consumes not defined');
             }
-            $mine = reset($serve_method['consumes']);
-            $consumer = $this->create_serializer($mine);
+            $mime = reset($serve_method['consumes']);
+            $consumer = $this->create_serializer($mime);
             if ($consumer == NULL) {
                 return http\ResponseBuilder::unsupported_media();
             }
@@ -343,18 +343,18 @@ class PhpaxRs {
     }
     
     /**
-     * Finds serializator that is able to serialize one of given mine types.
+     * Finds serializator that is able to serialize one of given MIME types.
      * 
-     * @param string $mine accepted mine
+     * @param string $mime accepted MIME
      * @return string|null class name of serializator or null
-     * @throws InvalidArgumentException on invalid mines
+     * @throws InvalidArgumentException on invalid MIMEs
      */
-    protected function find_serializator($mine) {
-        if (empty($mine)) {
-            throw new InvalidArgumentException('invalid mine passed');
+    protected function find_serializator($mime) {
+        if (empty($mime)) {
+            throw new InvalidArgumentException('invalid MIME passed');
         }
-        if (array_key_exists($mine, $this->serializators)) {
-            return $this->serializators[$mine];
+        if (array_key_exists($mime, $this->serializators)) {
+            return $this->serializators[$mime];
         }
         return NULL;
     }
@@ -411,13 +411,13 @@ class PhpaxRs {
     }
     
     /**
-     * Fills information about consuming mine types that are supported
+     * Fills information about consuming MIME types that are supported
      * by given end point methods and filter out methods that are not
      * capable of consuming the request.
      * 
      * @param array $methods list of methods for fill in
      * @param http\HttpRequest $request request for obtaining header info
-     * @param array $cdf default consume mine type
+     * @param array $cdf default consume MIME type
      * @return array filtered methods with appended consumes information
      */
     protected static function fill_in_consume_info(&$methods, $request, $cdf) {
@@ -425,10 +425,10 @@ class PhpaxRs {
         // iterate throught each method and fill consume/produce info field
         foreach ($methods as $i => $method) {
             $dc = $method['dc'];
-            $ct_mine = $request->get_content_type_header();
-            if ($ct_mine != NULL) { // CT header not present?
-                $mines = $dc->get_values(Annotations::CONSUME_MINES, $cdf);
-                $consumes = array_intersect(array($ct_mine), $mines);
+            $ct_mime = $request->get_content_type_header();
+            if ($ct_mime != NULL) { // CT header not present?
+                $mimes = $dc->get_values(Annotations::CONSUME_MINES, $cdf);
+                $consumes = array_intersect(array($ct_mime), $mimes);
                 if (!count($consumes)) {
                     unset($methods[$i]); // filter out
                     continue;
@@ -440,13 +440,13 @@ class PhpaxRs {
     }
     
     /**
-     * Fills information about producing mine types that are supported
+     * Fills information about producing MIME types that are supported
      * by given end point methods and filter out methods that are not
      * capable of produce accepted response.
      * 
      * @param array $methods list of methods for fill in
      * @param http\HttpRequest $request request for obtaining header info
-     * @param array $pdf default array of produce mine types
+     * @param array $pdf default array of produce MIME types
      * @return array filtered methods with appended produce information
      */
     protected static function fill_in_produce_info(&$methods, $request, $pdf) {

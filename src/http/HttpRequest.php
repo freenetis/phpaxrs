@@ -134,7 +134,7 @@ class HttpRequest {
     }
     
     /**
-     * Gets mine types from accept header sorted by their weight.
+     * Gets MIME types from accept header sorted by their weight.
      * 
      * @return null|array
      */

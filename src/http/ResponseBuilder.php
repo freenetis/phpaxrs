@@ -116,7 +116,7 @@ class ResponseBuilder {
     }
     
     /**
-     * REST API for serving exists but does not populate any of accepted mine
+     * REST API for serving exists but does not populate any of accepted MIME
      * types.
      * 
      * @return \phpaxrs\http\HttpResponse
