@@ -36,7 +36,7 @@ For easy building of `HttpResponse` the `ResponseBuilder` class may be used.
 class ExampleEndpoint {
     
     /**
-     * Data with which we manipulates.
+     * Data storage - commonly data are fetch from a DB.
      */
     private static $data = array(
         1 => 'Test',
@@ -99,15 +99,6 @@ class ExampleEndpoint {
         return ResponseBuilder::not_found();
     }
     
-    /**
-     * @GET
-     * @Path(/count)
-     * @Produces(text/plain)
-     */
-    public function count() {
-        return ResponseBuilder::ok(count(self::$data));
-    }
-    
 }
 ```
 
@@ -119,7 +110,7 @@ $phpaxrs = new \phpaxrs\PhpaxRs('/rest-api/test');
 // add serializator for JSON
 $phpaxrs->add_serializator('application/json', '\phpaxrs\serializator\JsonSerializator');
 // add end point and map it to relative URL to base user
-$phpaxrs->add_endpoint('/my-test-end-point');
+$phpaxrs->add_endpoint('/my-test-end-point', 'ExampleEndpoint');
 ```
 
 ### 3. Deploy and test
@@ -139,6 +130,6 @@ Just JSON for now, but you can write your custom serializator for any format you
 
 - support for HTTP Accept header with stars (e.g. `*/*` or `text/*`)
 - authorization & authentification
-- produce/consume multiple accept/content types in single mapped class
+- produce/consume multiple accept/content types in single mapped method/class
 - PHP error catching
 - *many more - this is just an early look*
