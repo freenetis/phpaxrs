@@ -454,19 +454,32 @@ class PhpaxRs {
         // iterate throught each method and fill consume/produce info field
         foreach ($methods as $i => $method) {
             $dc = $method['dc'];
-            $accepted_mines = $request->get_accept_header();
-            $produces = $mines = $dc->get_values(Annotations::PRODUCE_MINES, $pdf);
+            $accepted_mimes = $request->get_accept_header();
+            $produced_mimes = $dc->get_values(Annotations::PRODUCE_MINES, $pdf);
             $methods[$i]['produces_rating'] = PHP_INT_MAX;
             // Accept header not present => accept everything
-            if (count($accepted_mines)) {
-                $produces = array_intersect($accepted_mines, $mines);
-                if (!count($produces)) {
-                    unset($methods[$i]); // filter out
+            if (!count($accepted_mimes)) {
+                $methods[$i]['produces'] = $produced_mimes;
+            } else {
+                $methods[$i]['produces'] = array();
+                $rating = 0;
+                foreach ($accepted_mimes as $amime) {
+                    foreach ($produced_mimes as $pmime) {
+                        if (common\HttpUtil::accept_match($amime, $pmime)) {
+                            if (!count($methods[$i]['produces'])) {
+                                $methods[$i]['produces_rating'] = $rating;
+                            }
+                            $methods[$i]['produces'][] = $pmime;
+                        }
+                    }
+                    $rating++;
+                }
+                // filter out method on no match
+                if (!count($methods[$i]['produces'])) {
+                    unset($methods[$i]);
                     continue;
                 }
             }
-            $methods[$i]['produces'] = $produces;
-            $methods[$i]['produces_rating'] = array_search(reset($produces), $mines);
         }
         return $methods;
     }

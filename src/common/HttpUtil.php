@@ -8,7 +8,7 @@
 namespace phpaxrs\common;
 
 /**
- * The "HttpUtil" class 
+ * The "HttpUtil" class that cotain utility methods related to HTTP.
  *
  * @author Ondřej Fibich <ondrej.fibich@gmail.com>
  */
@@ -20,58 +20,58 @@ class HttpUtil {
      * @var Array
      */
     private static $messages = array(
-		// Informational 1xx
-		100 => 'Continue',
-		101 => 'Switching Protocols',
+        // Informational 1xx
+        100 => 'Continue',
+        101 => 'Switching Protocols',
 
-		// Success 2xx
-		200 => 'OK',
-		201 => 'Created',
-		202 => 'Accepted',
-		203 => 'Non-Authoritative Information',
-		204 => 'No Content',
-		205 => 'Reset Content',
-		206 => 'Partial Content',
+        // Success 2xx
+        200 => 'OK',
+        201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information',
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
 
-		// Redirection 3xx
-		300 => 'Multiple Choices',
-		301 => 'Moved Permanently',
-		302 => 'Found', // 1.1
-		303 => 'See Other',
-		304 => 'Not Modified',
-		305 => 'Use Proxy',
-		// 306 is deprecated but reserved
-		307 => 'Temporary Redirect',
+        // Redirection 3xx
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found', // 1.1
+        303 => 'See Other',
+        304 => 'Not Modified',
+        305 => 'Use Proxy',
+        // 306 is deprecated but reserved
+        307 => 'Temporary Redirect',
 
-		// Client Error 4xx
-		400 => 'Bad Request',
-		401 => 'Unauthorized',
-		402 => 'Payment Required',
-		403 => 'Forbidden',
-		404 => 'Not Found',
-		405 => 'Method Not Allowed',
-		406 => 'Not Acceptable',
-		407 => 'Proxy Authentication Required',
-		408 => 'Request Timeout',
-		409 => 'Conflict',
-		410 => 'Gone',
-		411 => 'Length Required',
-		412 => 'Precondition Failed',
-		413 => 'Request Entity Too Large',
-		414 => 'Request-URI Too Long',
-		415 => 'Unsupported Media Type',
-		416 => 'Requested Range Not Satisfiable',
-		417 => 'Expectation Failed',
+        // Client Error 4xx
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Requested Range Not Satisfiable',
+        417 => 'Expectation Failed',
 
-		// Server Error 5xx
-		500 => 'Internal Server Error',
-		501 => 'Not Implemented',
-		502 => 'Bad Gateway',
-		503 => 'Service Unavailable',
-		504 => 'Gateway Timeout',
-		505 => 'HTTP Version Not Supported',
-		509 => 'Bandwidth Limit Exceeded'
-	);
+        // Server Error 5xx
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+        509 => 'Bandwidth Limit Exceeded'
+    );
     
     /**
      * Gets message for the given HTTP status code.
@@ -114,5 +114,29 @@ class HttpUtil {
         // return sorted accepts mines
         return array_keys($accepts_parsed);
     }
-    
+
+    /**
+     * Checks whether given accept MIME that may contain * match given full
+     * MIME.
+     * 
+     * @param string $accept_mine MIME type that may contain * (e.g. text/*)
+     * @param string $mine full MIME (e.g. application/json)
+     * @return boolean match?
+     */
+    public static function accept_match($accept_mine, $mine) {
+        // invalid MIME
+        if (!preg_match('/^([*]|[-\w]+)\/([*]|[-\w]+)$/', $accept_mine) ||
+                !preg_match('/^[-\w]+\/[-\w]+$/', $mine)) {
+            return FALSE;
+        }
+        // string match
+        if (strpos($accept_mine, '*') === FALSE) {
+            return (strcmp($accept_mine, $mine) == 0); 
+        }
+        // build regex
+        $am_regex = '|' . str_replace('*', '([-\w]+)', $accept_mine) . '|';
+        // match?
+        return !!preg_match($am_regex, $mine);
+    }
+
 }

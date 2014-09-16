@@ -36,5 +36,34 @@ class HttpUtilTest extends \PHPUnit_Framework_TestCase {
     public function testParse_accept_header($header, $expected) {
         $this->assertEquals($expected, HttpUtil::parse_accept_header($header));
     }
+    
+    public function matchMimes() {
+        return array(
+            array(NULL, NULL, FALSE),
+            array('*/', NULL, FALSE),
+            array('*/**', NULL, FALSE),
+            array('aaaa*', NULL, FALSE),
+            array('*/*', 'aa', FALSE),
+            array('*/*', 'aa/', FALSE),
+            array('*/*', '*/*', FALSE),
+            array('*/*', 'aaaa/*', FALSE),
+            array('text/html', NULL, FALSE),
+            array('text/html', 'text/htm', FALSE),
+            array('text/html', 'text/html', TRUE),
+            array('text/*', 'text/html', TRUE),
+            array('text/*', 'text/plain', TRUE),
+            array('text/*', 'tex/plain', FALSE),
+            array('text/*', 'text/', FALSE),
+            array('*/*', 'text/plain', TRUE)
+        );
+    }
+
+    /**
+     * @covers phpaxrs\common\HttpUtil::accept_match
+     * @dataProvider matchMimes
+     */
+    public function testAccept_match($accept_mime, $mime, $expected) {
+        $this->assertEquals($expected, HttpUtil::accept_match($accept_mime, $mime));
+    }
 
 }

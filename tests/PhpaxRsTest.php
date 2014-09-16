@@ -56,6 +56,10 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
                 $jsr->marshall(ExampleEndpoint::$DATA)),
             array($bp . '/example/1', 'GET', array('Accept' => 'text/plain'),
                 200, 'text/plain', ExampleEndpoint::$DATA[1]),
+            array($bp . '/example/1', 'GET', array('Accept' => 'text/*'),
+                200, 'text/plain', ExampleEndpoint::$DATA[1]),
+            array($bp . '/example/1', 'GET', array('Accept' => '*/*'),
+                200, 'text/plain', ExampleEndpoint::$DATA[1]),
             array($bp . '/example/2', 'GET', $hd, 406, NULL, NULL),
             array($bp . '/example/2', 'GET', array('Accept' => 'text/plain'), 404, NULL, NULL),
             array($bp . '/eexample/2', 'GET', $hd, 404, NULL, NULL),
@@ -102,7 +106,7 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         ), 200, NULL, NULL, $jsr->marshall(array('id' => '11', 'name' => 'ahoj')));
         // check count
         $this->make_request($bp . '/count', 'GET', array(
-            'Accept' => 'text/plain'
+            'Accept' => 'text/*'
         ), 200, 'text/plain', '3');
         // edit
         $this->make_request($bp, 'PUT', array(
