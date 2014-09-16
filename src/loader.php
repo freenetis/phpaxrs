@@ -2,7 +2,7 @@
 
 /* 
  * This file is a part of PHPAX-RS framework, released under terms of GPL-3.0
- * licence. Copyright (c) 2014, UnArt, o.s. All rights reserved.
+ * licence. Copyright (c) 2014, UnArt Slavičín, o.s. All rights reserved.
  */
 
 if (PHP_VERSION_ID < 50301) {
