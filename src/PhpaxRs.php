@@ -131,6 +131,8 @@ class PhpaxRs {
      * 
      * @param string $url
      * @return http\HttpResponse
+     * @throws Exception on invalid or non existing server side scripts
+     *                   (end points or serializers)
      */
     public function serve($url) {
         return $this->serve_request(new http\HttpRequest(
@@ -145,6 +147,8 @@ class PhpaxRs {
      * 
      * @param http\HttpRequest $request
      * @return http\HttpResponse
+     * @throws Exception on invalid or non existing server side scripts
+     *                   (end points or serializers)
      */
     public function serve_request($request) {
         /* FIND END POINT FOR REQUEST */
