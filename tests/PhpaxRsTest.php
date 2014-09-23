@@ -39,6 +39,7 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         $this->api = new PhpaxRs('/freenetis-dev/api');
         $this->api->add_endpoint('/example', 'phpaxrs\ExampleEndpoint');
         $this->api->add_endpoint('/example/second', 'phpaxrs\Example2Endpoint');
+        $this->api->add_endpoint('/example/error', 'phpaxrs\ExampleErrorEndpoint');
         $this->api->add_serializator('application/json', 'phpaxrs\serializator\JsonSerializator');
         $this->api->add_serializator('text/plain', 'phpaxrs\ExampleTextSerializator');
     }
@@ -66,6 +67,12 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
             array($bp . '/example', 'DELETE', $hd, 404, NULL, NULL),
             array($bp . '/example/1', 'POST', $hd, 404, NULL, NULL),
             array($bp . '/example/123', 'DELETE', $hd, 404, NULL, NULL),
+            array($bp . '/example/error/uerror/notice', 'GET', $hd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/deprecated', 'GET', $hd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/warning', 'GET', $hd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/error', 'GET', $hd, 500, NULL, NULL),
+            array($bp . '/example/error/exception', 'GET', $hd, 500, NULL, NULL),
+            array($bp . '/example/error/php_error/include', 'GET', $hd, 500, NULL, NULL)
         );
     }
     
@@ -73,7 +80,8 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         $request = new http\HttpRequest($path, $method, $send_data, $headers);
         $response = $this->api->serve_request($request);
         // check response
-        $this->assertEquals($rs, $response->get_status(), 'status is different' . print_r($response, true));
+        $this->assertEquals($rs, $response->get_status(), 'status is different' 
+                . print_r($response, true));
         if ($rs < 400) { // do not test on error
             $headers = $response->get_headers();
             $this->assertEquals($ct, @$headers['Content-Type']);
@@ -114,6 +122,12 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
             'Content-Type' => $json
         ), 200, $json, $jsr->marshall(array('id' => '11', 'name' => 'ahoj2')),
                 $jsr->marshall(array('id' => '11', 'name' => 'ahoj2')));
+        // edit (invalid id)
+        $this->make_request($bp, 'PUT', array(
+            'Accept' => $json,
+            'Content-Type' => $json
+        ), 404, $json, 'not found',
+                $jsr->marshall(array('id' => '110101', 'name' => 'ahoj2')));
         // delete
         $this->make_request($bp . '/11', 'DELETE', NULL, 200, NULL, NULL);
         // check count
@@ -252,7 +266,7 @@ class ExampleEndpoint {
             return ResponseBuilder::bad_request();
         }
         if (!array_key_exists($data['id'], self::$data)) {
-            return ResponseBuilder::not_found();
+            return ResponseBuilder::not_found('not found');
         }
         self::$data[$data['id']] = $data['name'];
         return ResponseBuilder::ok(array(
@@ -309,6 +323,78 @@ class Example2Endpoint {
      */
     public function get_all($text) {
         return array($text, 'a', 'b', 'c');
+    }
+    
+}
+
+/**
+ * @Consumes(application/json)
+ * @Produces(application/json)
+ */
+class ExampleErrorEndpoint {
+    
+    /**
+     * @GET
+     * @Path(/exception)
+     */
+    public function exception() {
+        throw new \Exception;
+    }
+    
+    /**
+     * @GET
+     * @Path(/uerror/notice)
+     */
+    public function php_uerror_notice() {
+        trigger_error('notice', E_USER_NOTICE);
+        return array();
+    }
+    
+    /**
+     * @GET
+     * @Path(/uerror/deprecated)
+     */
+    public function php_uerror_deprecated() {
+        trigger_error('deprecated', E_USER_DEPRECATED);
+        return array();
+    }
+    
+    /**
+     * @GET
+     * @Path(/uerror/warning)
+     */
+    public function php_uerror_warning() {
+        trigger_error('warning', E_USER_WARNING);
+        return array();
+    }
+    
+    /**
+     * @GET
+     * @Path(/uerror/error)
+     */
+    public function php_uerror_error() {
+        trigger_error('warning', E_USER_ERROR);
+        return array();
+    }
+    
+    /**
+     * @GET
+     * @Path(/php_error/include)
+     */
+    public function php_error_include() {
+        include '~awdawkpdap';
+        return array();
+    }
+    
+    /**
+     * Fatal error cannot be tested via PHPUnit, test manually.
+     * 
+     * @GET
+     * @Path(/php_error/fatal)
+     */
+    public function php_error_fatal() {
+        $a->b();
+        return array();
     }
     
 }

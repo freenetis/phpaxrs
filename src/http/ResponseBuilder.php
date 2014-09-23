@@ -26,7 +26,7 @@ class ResponseBuilder {
      * 
      * @param int $status_code
      */
-    protected function __construct($status_code = 200) {
+    protected function __construct($status_code) {
         $this->response = new HttpResponse($status_code);
     }
     
@@ -73,7 +73,13 @@ class ResponseBuilder {
      */
     public static function create($status = 200, $entity = NULL) {
         $rb = new ResponseBuilder($status);
-        return ($entity !== NULL) ? $rb->body($entity) : $rb;
+        if ($entity !== NULL) {
+            $rb->body($entity);
+            if (is_string($entity) && $status >= 400) {
+                $rb->header('Content-Type', 'text/plain');
+            }
+        }
+        return $rb;
     }
     
     /**
@@ -84,6 +90,20 @@ class ResponseBuilder {
      */
     public static function ok($entity = NULL) {
         return self::create(200, $entity)->build();
+    }
+    
+    /**
+     * Created.
+     * 
+     * @param string $location_header location header of created [optional]
+     * @return \phpaxrs\http\HttpResponse
+     */
+    public static function created($location_header = NULL) {
+        $rb = self::create(201);
+        if (!empty($location_header)) {
+            $rb->header('Location', $location_header);
+        }
+        return $rb->build();
     }
     
     /**
@@ -141,7 +161,10 @@ class ResponseBuilder {
      * @return \phpaxrs\http\HttpResponse
      */
     public static function server_error($ex = NULL) {
-        $m = ($ex instanceof Exception) ? $ex->getMessage() : strval($ex);
+        $m = NULL;
+        if ($ex !== NULL) {
+            $m = ($ex instanceof \Exception) ? $ex->getMessage() : strval($ex);
+        }
         return self::create(500, $m)->build();
     }
 

@@ -245,12 +245,30 @@ class PhpaxRs {
             }
             
         }
-        
         // call method 
-        try { // TODO: handle also PHP errors
+        try {
             $ep_instance = $r_ep->newInstanceArgs();
+            // handle PHP errors
+            set_error_handler(function($severenity, $message, $file, $line) {
+                throw new \Exception('Error during processing: ' . $message);
+            });
+            // handle PHP fatal errors
+            register_shutdown_function(function () {
+                static $one_time_only = TRUE; // protection before loop
+                $error = error_get_last();
+                if ($one_time_only && $error['type'] == E_ERROR) {
+                    if (!headers_sent()) {
+                        $status_text = common\HttpUtil::status_message(500);
+                        header('HTTP/1.0 500 ' . $status_text);
+                        header('Content-Type: text/plain');
+                    }
+                    die("PHP fatal error: " . print_r($error, TRUE));
+                }
+            });
             $output = $serve_method['rm']->invokeArgs($ep_instance, $args);
-        } catch (Exception $ex) {
+            restore_error_handler();
+        } catch (\Exception $ex) {
+            restore_error_handler();
             return http\ResponseBuilder::server_error($ex);
         }
         
@@ -259,8 +277,9 @@ class PhpaxRs {
             $output = http\ResponseBuilder::ok($output);
         }
         
-        // no output?
-        if ($output->get_body() !== NULL) {
+        // no output? or output already serialized (error case)
+        if ($output->get_body() !== NULL &&
+                !$output->has_header('Content-Type')) {
             // serialize body
             $producer = NULL;
             $content_type = NULL;

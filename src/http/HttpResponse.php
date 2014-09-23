@@ -59,6 +59,16 @@ class HttpResponse {
     }
     
     /**
+     * Checks whether the header with the given name is present.
+     * 
+     * @param string $name
+     * @return boolean
+     */
+    public function has_header($name) {
+        return array_key_exists($name, $this->headers);
+    }
+    
+    /**
      * Gets all headers.
      * 
      * @return Array key is header name value is header value
