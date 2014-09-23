@@ -129,4 +129,3 @@ Just JSON for now, but you can write your custom serializator for any format you
 ## TODO list - what important is not done yet?
 
 - produce/consume multiple accept/content types in single mapped method/class
-- PHP error catching
