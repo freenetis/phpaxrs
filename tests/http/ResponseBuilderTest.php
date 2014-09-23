@@ -48,33 +48,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
      * @todo   Implement testCreate().
      */
     public function testCreate() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers phpaxrs\http\ResponseBuilder::ok
-     */
-    public function testOk() {
-        $r = ResponseBuilder::ok();
-        $this->assertNotNull($r);
-        $this->assertNull($r->get_body());
-        $this->assertEquals(200, $r->get_status());
-        $this->assertEquals(0, count($r->get_headers()));
-        
-        $r = ResponseBuilder::ok(array(1 => 'a'));
-        $this->assertNotNull($r);
-        $this->assertEquals(array(1 => 'a'), $r->get_body());
-        $this->assertEquals(200, $r->get_status());
-        $this->assertEquals(0, count($r->get_headers()));
-    }
-
-    /**
-     * @covers phpaxrs\http\ResponseBuilder::created
-     */
-    public function testCreated() {
         $r = ResponseBuilder::create()->build();
         $this->assertNotNull($r);
         $this->assertNull($r->get_body());
@@ -107,6 +80,43 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($r->has_header('Content-Type'));
         $hds = $r->get_headers();
         $this->assertEquals('text/plain', $hds['Content-Type']);
+    }
+
+    /**
+     * @covers phpaxrs\http\ResponseBuilder::ok
+     */
+    public function testOk() {
+        $r = ResponseBuilder::ok();
+        $this->assertNotNull($r);
+        $this->assertNull($r->get_body());
+        $this->assertEquals(200, $r->get_status());
+        $this->assertEquals(0, count($r->get_headers()));
+        
+        $r = ResponseBuilder::ok(array(1 => 'a'));
+        $this->assertNotNull($r);
+        $this->assertEquals(array(1 => 'a'), $r->get_body());
+        $this->assertEquals(200, $r->get_status());
+        $this->assertEquals(0, count($r->get_headers()));
+    }
+
+    /**
+     * @covers phpaxrs\http\ResponseBuilder::created
+     */
+    public function testCreated() {
+        $r = ResponseBuilder::created();
+        $this->assertNotNull($r);
+        $this->assertNull($r->get_body());
+        $this->assertEquals(201, $r->get_status());
+        $this->assertEquals(0, count($r->get_headers()));
+        
+        $r = ResponseBuilder::created('http://example.com/1');
+        $this->assertNotNull($r);
+        $this->assertNull($r->get_body());
+        $this->assertEquals(201, $r->get_status());
+        $this->assertEquals(1, count($r->get_headers()));
+        $this->assertTrue($r->has_header('Location'));
+        $hds = $r->get_headers();
+        $this->assertEquals('http://example.com/1', $hds['Location']);
     }
 
     /**
