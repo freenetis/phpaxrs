@@ -58,7 +58,7 @@ class ExampleEndpoint {
             return ResponseBuilder::bad_request();
         }
         self::$data[$data['id']] = $data['name'];
-        return ResponseBuilder::ok();
+        return ResponseBuilder::created();
     }
     
     /**
@@ -72,7 +72,7 @@ class ExampleEndpoint {
             return ResponseBuilder::not_found();
         }
         self::$data[$data['id']] = $data['name'];
-        return ResponseBuilder::ok();
+        return ResponseBuilder::no_content();
     }
     
     /**
@@ -94,7 +94,7 @@ class ExampleEndpoint {
     public function delete_item($id) {
         if (array_key_exists($id, self::$data)) {
             unset(self::$data[$id]);
-            return ResponseBuilder::ok();
+            return ResponseBuilder::no_content();
         }
         return ResponseBuilder::not_found();
     }
