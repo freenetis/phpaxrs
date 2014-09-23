@@ -9,7 +9,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::body
-     * @todo   Implement testBody().
      */
     public function testBody() {
         $rb = ResponseBuilder::create();
@@ -45,7 +44,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::create
-     * @todo   Implement testCreate().
      */
     public function testCreate() {
         $r = ResponseBuilder::create()->build();
@@ -132,7 +130,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::bad_request
-     * @todo   Implement testBad_request().
      */
     public function testBad_request() {
         $r = ResponseBuilder::bad_request();
@@ -153,7 +150,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::not_found
-     * @todo   Implement testNot_found().
      */
     public function testNot_found() {
         $r = ResponseBuilder::not_found();
@@ -174,7 +170,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::not_acceptable
-     * @todo   Implement testNot_acceptable().
      */
     public function testNot_acceptable() {
         $r = ResponseBuilder::not_acceptable();
@@ -186,7 +181,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::unsupported_media
-     * @todo   Implement testUnsupported_media().
      */
     public function testUnsupported_media() {
         $r = ResponseBuilder::unsupported_media();
@@ -198,7 +192,6 @@ class ResponseBuilderTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @covers phpaxrs\http\ResponseBuilder::server_error
-     * @todo   Implement testServer_error().
      */
     public function testServer_error() {
         $r = ResponseBuilder::server_error();
