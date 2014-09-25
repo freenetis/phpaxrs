@@ -223,7 +223,12 @@ class PhpaxRs {
         $args = $serve_method['args'];
         
         // unmarshall input
-        if ($request->has_body() && $request->get_body() !== NULL) {
+        if ($request->has_body()) {
+            // bad request if POST or PUT and does not have body
+            if ($request->get_body() === NULL) {
+                return http\ResponseBuilder::bad_request();
+            }
+            print_r($serve_method);
             if (!count($serve_method['consumes'])) {
                 if (!count($request->get_content_type_header())) {
                     // CT header missing
@@ -457,6 +462,8 @@ class PhpaxRs {
                     continue;
                 }
                 $methods[$i]['consumes'] = $consumes;
+            } else {
+                $methods[$i]['consumes'] = array();
             }
         }
         return $methods;

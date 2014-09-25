@@ -51,28 +51,48 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         $jsr = new \phpaxrs\serializator\JsonSerializator();
         $bp = 'http://localhost/freenetis-dev/api';
         $json = 'application/json';
-        $hd = array('Accept' => $json);
+        $jhd = array('Accept' => $json);
+        $thd = array('Accept' => 'text/plain');
         return array(
-            array($bp . '/example', 'GET', $hd, 200, $json,
+            array($bp . '/example', 'GET', $jhd, 200, $json,
                 $jsr->marshall(ExampleEndpoint::$DATA)),
-            array($bp . '/example/1', 'GET', array('Accept' => 'text/plain'),
+            array($bp . '/example/1', 'GET', $thd,
                 200, 'text/plain', ExampleEndpoint::$DATA[1]),
             array($bp . '/example/1', 'GET', array('Accept' => 'text/*'),
                 200, 'text/plain', ExampleEndpoint::$DATA[1]),
             array($bp . '/example/1', 'GET', array('Accept' => '*/*'),
                 200, 'text/plain', ExampleEndpoint::$DATA[1]),
-            array($bp . '/example/2', 'GET', $hd, 406, NULL, NULL),
-            array($bp . '/example/2', 'GET', array('Accept' => 'text/plain'), 404, NULL, NULL),
-            array($bp . '/eexample/2', 'GET', $hd, 404, NULL, NULL),
-            array($bp . '/example', 'DELETE', $hd, 404, NULL, NULL),
-            array($bp . '/example/1', 'POST', $hd, 404, NULL, NULL),
-            array($bp . '/example/123', 'DELETE', $hd, 404, NULL, NULL),
-            array($bp . '/example/error/uerror/notice', 'GET', $hd, 500, NULL, NULL),
-            array($bp . '/example/error/uerror/deprecated', 'GET', $hd, 500, NULL, NULL),
-            array($bp . '/example/error/uerror/warning', 'GET', $hd, 500, NULL, NULL),
-            array($bp . '/example/error/uerror/error', 'GET', $hd, 500, NULL, NULL),
-            array($bp . '/example/error/exception', 'GET', $hd, 500, NULL, NULL),
-            array($bp . '/example/error/php_error/include', 'GET', $hd, 500, NULL, NULL)
+            array($bp . '/example/2', 'GET', $jhd, 406, NULL, NULL),
+            array($bp . '/example/2', 'GET', $thd, 404, NULL, NULL),
+            array($bp . '/eexample/2', 'GET', $jhd, 404, NULL, NULL),
+            array($bp . '/example', 'DELETE', $jhd, 404, NULL, NULL),
+            array($bp . '/example/1', 'POST', $jhd, 404, NULL, NULL),
+            array($bp . '/example/123', 'DELETE', $jhd, 404, NULL, NULL),
+            // error handling
+            array($bp . '/example/error/uerror/notice', 'GET', $jhd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/deprecated', 'GET', $jhd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/warning', 'GET', $jhd, 500, NULL, NULL),
+            array($bp . '/example/error/uerror/error', 'GET', $jhd, 500, NULL, NULL),
+            array($bp . '/example/error/exception', 'GET', $jhd, 500, NULL, NULL),
+            array($bp . '/example/error/php_error/include', 'GET', $jhd, 500, NULL, NULL),
+            // multiple produces MIMEs
+            array($bp . '/example/second/multiple_produces', 'GET', $thd, 200, 
+                'text/plain', 'Array'),
+            array($bp . '/example/second/multiple_produces', 'GET', $jhd, 200,
+                'application/json', '{"test":"Test"}')
+        );
+    }
+    
+    public function providerTestServeWithSend() {
+        $bp = 'http://localhost/freenetis-dev/api';
+        $jhd = array('Accept' => 'text/plain', 'Content-Type' => 'application/json');
+        $thd = array('Accept' => 'text/plain', 'Content-Type' => 'text/plain');
+        return array(
+            // multiple consumes MIMEs
+            array($bp . '/example/second/multiple_consumes', 'POST', 
+                $thd, 200, 'text/plain', 'aaa', 'aaa'),
+            array($bp . '/example/second/multiple_consumes', 'POST', 
+                $jhd, 200, 'text/plain', 'Array', '{"a":"a"}')
         );
     }
     
@@ -83,8 +103,9 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($rs, $response->get_status(), 'status is different' 
                 . print_r($response, true));
         if ($rs < 400) { // do not test on error
-            $headers = $response->get_headers();
-            $this->assertEquals($ct, @$headers['Content-Type']);
+            $rheaders = $response->get_headers();
+            $rct = isset($rheaders['Content-Type']) ? $rheaders['Content-Type'] : NULL;
+            $this->assertEquals($ct, $rct);
             $this->assertEquals($body, $response->get_body());
         }
     }
@@ -94,6 +115,13 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
      */
     public function testServe($path, $method, $headers, $rs, $ct, $body) {
         $this->make_request($path, $method, $headers, $rs, $ct, $body);
+    }
+    
+    /**
+     * @dataProvider providerTestServeWithSend
+     */
+    public function testServeWithSend($path, $method, $headers, $rs, $ct, $body, $send_data) {
+        $this->make_request($path, $method, $headers, $rs, $ct, $body, $send_data);
     }
     
     public function testComplex() {
@@ -323,6 +351,27 @@ class Example2Endpoint {
      */
     public function get_all($text) {
         return array($text, 'a', 'b', 'c');
+    }
+    
+    /**
+     * @POST
+     * @Path(/multiple_consumes)
+     * @Consumes(text/plain)
+     * @Consumes(application/json)
+     * @Produces(text/plain)
+     */
+    public function multiple_consumes($data) {
+        return strval($data);
+    }
+    
+    /**
+     * @GET
+     * @Path(/multiple_produces)
+     * @Produces(application/json)
+     * @Produces(text/plain)
+     */
+    public function multiple_produces() {
+        return array('test' => 'Test');
     }
     
 }
