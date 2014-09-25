@@ -125,7 +125,3 @@ and output should be following:
 ## What are supported exchange data formats?
 
 Just JSON for now, but you can write your custom serializator for any format you want. Its simple, just implement `\phpaxrs\serializator\ISerializator` interface and than register its class together with supported MINE type using `add_serializator` method as show shown before.
-
-## TODO list - what important is not done yet?
-
-- produce/consume multiple accept/content types in single mapped method/class
