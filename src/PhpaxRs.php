@@ -228,7 +228,6 @@ class PhpaxRs {
             if ($request->get_body() === NULL) {
                 return http\ResponseBuilder::bad_request();
             }
-            print_r($serve_method);
             if (!count($serve_method['consumes'])) {
                 if (!count($request->get_content_type_header())) {
                     // CT header missing
