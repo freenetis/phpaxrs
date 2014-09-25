@@ -77,7 +77,7 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
             array($bp . '/example/error/php_error/include', 'GET', $jhd, 500, NULL, NULL),
             // multiple produces MIMEs
             array($bp . '/example/second/multiple_produces', 'GET', $thd, 200, 
-                'text/plain', 'Array'),
+                'text/plain', print_r(array('test' => 'Test'), TRUE)),
             array($bp . '/example/second/multiple_produces', 'GET', $jhd, 200,
                 'application/json', '{"test":"Test"}')
         );
@@ -91,8 +91,8 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
             // multiple consumes MIMEs
             array($bp . '/example/second/multiple_consumes', 'POST', 
                 $thd, 200, 'text/plain', 'aaa', 'aaa'),
-            array($bp . '/example/second/multiple_consumes', 'POST', 
-                $jhd, 200, 'text/plain', 'Array', '{"a":"a"}')
+            array($bp . '/example/second/multiple_consumes', 'POST', $jhd, 200,
+                'text/plain', print_r(array('a' => 'a'), TRUE), '{"a":"a"}')
         );
     }
     
@@ -100,8 +100,7 @@ class PhpaxRsTest extends \PHPUnit_Framework_TestCase {
         $request = new http\HttpRequest($path, $method, $send_data, $headers);
         $response = $this->api->serve_request($request);
         // check response
-        $this->assertEquals($rs, $response->get_status(), 'status is different' 
-                . print_r($response, true));
+        $this->assertEquals($rs, $response->get_status(), 'status is different');
         if ($rs < 400) { // do not test on error
             $rheaders = $response->get_headers();
             $rct = isset($rheaders['Content-Type']) ? $rheaders['Content-Type'] : NULL;
@@ -361,7 +360,7 @@ class Example2Endpoint {
      * @Produces(text/plain)
      */
     public function multiple_consumes($data) {
-        return strval($data);
+        return print_r($data, TRUE);
     }
     
     /**
@@ -451,7 +450,7 @@ class ExampleErrorEndpoint {
 class ExampleTextSerializator implements serializator\ISerializator {
     
     public function marshall($object) {
-        return strval($object);
+        return print_r($object, TRUE);
     }
 
     public function unmarshall($object_as_str) {
