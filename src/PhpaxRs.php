@@ -21,9 +21,6 @@ use \phpaxrs\common\PathUtil;
  * Written for PHP 5.3 and higher.
  *
  * @author Ondřej Fibich <ondrej.fibich@gmail.com>
- * 
- * @todo support content and accept type with * (e.g. text/*)
- * @todo handle PHP error (currently only exceptions are handled)
  */
 class PhpaxRs {
     
