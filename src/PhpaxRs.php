@@ -25,6 +25,11 @@ use \phpaxrs\common\PathUtil;
 class PhpaxRs {
     
     /**
+     * PHPAX-RS version.
+     */
+    const VERSION = '0.1.0';
+    
+    /**
      * Serializators for (un)marchalling of object from request and responses.
      * 
      * Stored in associative array where key is accepted MIME and value is
@@ -71,12 +76,12 @@ class PhpaxRs {
         if (!PathUtil::is_valid($base_ep_path)) {
             throw new InvalidArgumentException('invalid end point path');
         }
-        $base_ep_path = PathUtil::normalize($base_ep_path);
-        if (array_key_exists($base_ep_path, $this->end_points)) {
-            $m = 'path ' . $base_ep_path . ' already registered';
+        $normalized_base_ep_path = PathUtil::normalize($base_ep_path);
+        if (array_key_exists($normalized_base_ep_path, $this->end_points)) {
+            $m = 'path ' . $normalized_base_ep_path . ' already registered';
             throw new InvalidArgumentException($m);
         }
-        $this->end_points[$base_ep_path] = $end_point_cn;
+        $this->end_points[$normalized_base_ep_path] = $end_point_cn;
     }
     
     /**
@@ -90,15 +95,15 @@ class PhpaxRs {
         if (empty($serializator_cn)) {
             throw new InvalidArgumentException('invalid serializator');
         }
-        $mime = mb_strtolower(trim($mime));
-        if (empty($mime)) {
+        $tl_mime = mb_strtolower(trim($mime));
+        if (empty($tl_mime)) {
             throw new InvalidArgumentException('invalid mime: ' . $mime);
         }
-        if (array_key_exists($mime, $this->serializators)) {
+        if (array_key_exists($tl_mime, $this->serializators)) {
             $m = 'serializator for mime ' . $mime . ' already exist';
             throw new InvalidArgumentException($m);
         }
-        $this->serializators[$mime] = $serializator_cn;
+        $this->serializators[$tl_mime] = $serializator_cn;
     }
 
     /**
@@ -346,11 +351,11 @@ class PhpaxRs {
         $found = null;
         $found_lenght = -1;
         // / at the end of path required
-        $request_path = PathUtil::normalize($request_path);
+        $n_request_path = PathUtil::normalize($request_path);
         // search for match in path of each end point
         foreach ($this->end_points as $ep_bp => $ep) {
             if (mb_strlen($ep_bp) > $found_lenght &&
-                    strncmp($request_path, $ep_bp, mb_strlen($ep_bp)) === 0) {
+                    strncmp($n_request_path, $ep_bp, mb_strlen($ep_bp)) === 0) {
                 $found = $ep_bp;
                 $found_lenght = mb_strlen($found);
             }
@@ -392,7 +397,7 @@ class PhpaxRs {
      * @return Array
      */
     protected static function get_endpoint_methods($rep, $http_method) {
-        $http_method = strtoupper($http_method);
+        $l_http_method = strtoupper($http_method);
         $public_methods = array_diff(
                 $rep->getMethods(\ReflectionMethod::IS_PUBLIC),
                 $rep->getMethods(\ReflectionMethod::IS_STATIC),
@@ -404,7 +409,7 @@ class PhpaxRs {
             $r_method = new \ReflectionMethod($rep->getName(), $method->name);
             $dc_method = new DocCommentWrapper($r_method->getDocComment());
             // check if @<method> annotation is present
-            if ($dc_method->is_present($http_method)) {
+            if ($dc_method->is_present($l_http_method)) {
                 $methods[] = array('rm' => $r_method, 'dc' => $dc_method);
             }
         }
@@ -445,7 +450,9 @@ class PhpaxRs {
      * @return array filtered methods with appended consumes information
      */
     protected static function fill_in_consume_info(&$methods, $request, $cdf) {
-        $cdf = empty($cdf) ? array() : $cdf;
+        if (empty($cdf)) {
+            $cdf = array();
+        }
         // iterate throught each method and fill consume/produce info field
         foreach ($methods as $i => $method) {
             $dc = $method['dc'];
@@ -476,7 +483,9 @@ class PhpaxRs {
      * @return array filtered methods with appended produce information
      */
     protected static function fill_in_produce_info(&$methods, $request, $pdf) {
-        $pdf = empty($pdf) ? array() : $pdf;
+        if (empty($pdf)) {
+            $pdf = array();
+        }
         // iterate throught each method and fill consume/produce info field
         foreach ($methods as $i => $method) {
             $dc = $method['dc'];
