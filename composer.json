@@ -2,7 +2,7 @@
     "name": "phpax-rs/phpax-rs",
     "type": "library",
     "description": "JAX-RS like framework for writing REST APIs in PHP",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "keywords": ["rest", "jax-rs"],
     "license": ["GPL-3.0"],
     "homepage": "https://github.com/freenetis/phpaxrs",
